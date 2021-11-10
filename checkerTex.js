@@ -1,6 +1,6 @@
 class CheckerTex {
   constructor() {
-    this.graphic = createGraphics(1000, 1000);
+    this.graphic = createGraphics(2000, 2000);
     this.divNum = 3;
     console.log(this.graphic);
   }
