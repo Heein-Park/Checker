@@ -3,11 +3,22 @@ let checkerTex;
 let camera;
 let axis;
 
+let randomizer;
+let meta;
+
 const boxNum = 256;
 const array = [];
 
 function preload() {
   checkerBall = loadModel('assets/CheckerBall.obj', true, () => console.log("hello!world"));
+  
+  const owner = beyondHelpers.get('owner', '0x0000000000000000000000000000000000000000');
+  const viewer = beyondHelpers.get('viewer', '0x0000000000000000000000000000000000000000');
+
+  meta = {
+    owner,
+    viewer,
+  };
 }
 
 function setup() {
@@ -15,6 +26,7 @@ function setup() {
   
   createCanvas(windowWidth, windowHeight, WEBGL);
   checkerTex = new CheckerTex();
+  randomizer = new P5DeterministicRandomWithHexSeed(meta.owner);
   
   axis = {
     x: createVector(1,0,0),
