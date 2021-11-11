@@ -1,7 +1,9 @@
 let checkerBall;
 let checkerTex;
 let camera;
-let axis;
+
+let pan_time = 60; // A Minute
+let tilt_time = 86400; // A Day
 
 const boxNum = 256;
 const array = [];
@@ -11,48 +13,43 @@ function preload() {
 }
 
 function setup() {
-  angleMode(DEGREES);
+  angleMode(RADIANS);
   
   createCanvas(windowWidth, windowHeight, WEBGL);
   checkerTex = new CheckerTex();
   
-  axis = {
-    x: createVector(1,0,0),
-    y: createVector(0,1,0),
-    z: createVector(0,0,1),
-  };
-  
   for(let i = 0; i < boxNum; i++) {
-    let horizontal = randomGaussian(0, 1000);
-    let vertical = randomGaussian(0, 1000);
-    let depth = randomGaussian(0, 1000);
-    let vec = createVector(horizontal, vertical, depth);    
+    let theta = randomGaussian(0, PI);
+    let phi = randomGaussian(0, PI);
+    let depth = randomGaussian(100, 200);
+    let vec = p5.Vector.fromAngles(theta, phi, depth);
     array.push(vec);
   }
   
-  let _i = floor(random(0,boxNum));
-  
-  console.log(_i);
   camera = createCamera();
-  let cameraPos = array[_i];
-  camera.setPosition(cameraPos.x, cameraPos.y, cameraPos.z);
-  camera.lookAt(0,0,0);
-  ortho();
+  camera.setPosition(0, 0, 0);
+  
+  perspective();
   ambientLight(255);
 }
 
 function draw() {
-  let black = color(0, 0, 0);
-  background(black);
+  background(0);
   checkerTex._draw();
   
-  camera.pan(0.1);
+  let panAng = getAngle(pan_time);
+  let tiltAng = getAngle(tilt_time);
   
+  tiltAng = tiltAng >= PI? TAU - tiltAng: tiltAng;
+  
+  let lookAtVec = p5.Vector.fromAngles(tiltAng, panAng);
+  camera.lookAt(lookAtVec.x, lookAtVec.y, lookAtVec.z);
+    
   for(let i = 0; i < boxNum; i++) {
     push();
     blendMode(DIFFERENCE);
     translate(array[i]);
-    scale(5);
+    scale(1);
     noStroke();
     texture(checkerTex.call());
     textureWrap(CLAMP);
@@ -61,12 +58,15 @@ function draw() {
   }
 }
 
+function getAngle(time = 1) {
+  if(time != 0) {
+    return map(Date.now() % (1000 * time), 0, (1000 * time), 0, TAU, true);
+  } else {
+    throw "time is zero";
+  }
+}
+
 function windowResized() {
   resizeCanvas(windowWidth, windowHeight);
-  
-  let _i = floor(random(0,boxNum));
-  let cameraPos = array[_i];
-  camera.setPosition(cameraPos.x, cameraPos.y, cameraPos.z);
-  camera.lookAt(0,0,0);
-  ortho();
+  camera.setPosition(0, 0, 0);
 }
