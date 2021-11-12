@@ -5,11 +5,11 @@ let camera;
 let pan_time = 60; // A Minute
 let tilt_time = 86400; // A Day
 
-const boxNum = 256;
+const boxNum = 64;
 const array = [];
 
 function preload() {
-  checkerBall = loadModel('assets/CheckerBall.obj', true, () => console.log("hello!world"));
+  checkerBall = loadModel('assets/CheckerBall.obj', true);
 }
 
 function setup() {
