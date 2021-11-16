@@ -1,6 +1,8 @@
 class CheckerTex {
   constructor(int) {
     this.g = createGraphics(1600, 1600);
+    
+    this.g.c = color(floor(random(0, 255)), floor(random(0, 255)), floor(random(0, 255)));    
     this.g.divNum = 10;
     this.g.angleMode(RADIANS);
     this.g.setSeed = this.setSeed.bind(this.g);
@@ -15,7 +17,7 @@ class CheckerTex {
     for(let _w = w_division * 3/4; _w < this.width; _w += w_division) {
       this.push();
       this.strokeCap(SQUARE);
-      this.stroke(0);
+      this.stroke(this.c);
       this.strokeWeight(w_division * noise(_w));
       this.line(_w, 0, _w, this.height);
       this.pop();
@@ -26,7 +28,7 @@ class CheckerTex {
       this.push();
       this.blendMode(DIFFERENCE);
       this.strokeCap(SQUARE);
-      this.stroke(255);
+      this.stroke(this.c);
       this.strokeWeight(h_division * noise(_h));
       this.line(0, _h, this.width, _h);
       this.pop();
@@ -36,6 +38,7 @@ class CheckerTex {
   setSeed(int) {
     this.noiseSeed(int);
     this.randomSeed(int);
-    console.log("Set the seed in a graphic, ", this, int);
+    this.c = color(floor(random(0, 255)), floor(random(0, 255)), floor(random(0, 255)));    
+    //console.log("Set the seed in a graphic, ", this, int);
   }
 }
