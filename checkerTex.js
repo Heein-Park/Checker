@@ -1,8 +1,25 @@
 class CheckerTex {
   constructor(int) {
-    this.g = createGraphics(1600, 1600);
+    this.g = createGraphics(2000, 2000);
     
-    this.g.c = color(floor(random(0, 255)), floor(random(0, 255)), floor(random(0, 255)));    
+    this.g.blendArray = [ADD,
+                        DARKEST,
+                        LIGHTEST,
+                        DIFFERENCE,
+                        EXCLUSION,
+                        MULTIPLY,
+                        SCREEN,
+                        REPLACE,
+                        OVERLAY,
+                        HARD_LIGHT,
+                        SOFT_LIGHT,
+                        DODGE,
+                        BURN];
+                        
+    this.g.blend = this.g.blendArray[floor(random(0, this.g.blendArray.length))];
+    this.g.c = color(floor(random(0, 255)), floor(random(0, 255)), floor(random(0, 255)));
+    this.g.c.invert = color(red(this.g.c), green(this.g.c), blue(this.g.c)); 
+    
     this.g.divNum = 10;
     this.g.angleMode(RADIANS);
     this.g.setSeed = this.setSeed.bind(this.g);
@@ -26,9 +43,9 @@ class CheckerTex {
     const h_division = this.height/this.divNum;
     for(let _h = h_division * 3/4; _h < this.height; _h += h_division) {
       this.push();
-      this.blendMode(DIFFERENCE);
+      this.blendMode(this.blend);
       this.strokeCap(SQUARE);
-      this.stroke(this.c);
+      this.stroke(this.c.invert);
       this.strokeWeight(h_division * noise(_h));
       this.line(0, _h, this.width, _h);
       this.pop();
@@ -38,7 +55,8 @@ class CheckerTex {
   setSeed(int) {
     this.noiseSeed(int);
     this.randomSeed(int);
-    this.c = color(floor(random(0, 255)), floor(random(0, 255)), floor(random(0, 255)));    
-    //console.log("Set the seed in a graphic, ", this, int);
+    this.c = color(floor(random(0, 255)), floor(random(0, 255)), floor(random(0, 255)));
+    this.c.invert = color(red(this.c), green(this.c), blue(this.c)); 
+    this.blend = this.blendArray[floor(random(0, this.blendArray.length))];
   }
 }
