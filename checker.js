@@ -4,9 +4,8 @@ let checkerBall;
 let checkerTex;
 let camera;
 let gui;
-let prev;
+let tokenSeed, defaultSeed, prev;
 let centerVector, dragVector, pressVector;
-
 let canvas;
 
 const scrConstant = 1920;
@@ -23,6 +22,27 @@ function preload() {
 }
 
 function setup() {
+  const _uid = uuid.parse(uuid.v4());
+  //console.log(_uid);
+  
+  let _prevByte;
+  for (const unhexed of _uid) {
+    //console.log("Value in UID Array : ", unhexed);
+    //console.log("defaultSeed : ", defaultSeed);
+    if (defaultSeed) {
+      defaultSeed %= unhexed + 10;
+      //console.log("defaultSeed %= unhexed : ", defaultSeed);
+      
+      defaultSeed *= _prevByte;
+      //console.log("defaultSeed * _prevByte : ", defaultSeed);
+    } else {
+      defaultSeed = unhexed;
+      _initialByte = unhexed;
+    }
+    
+    _prevByte = unhexed;
+  }
+  
   angleMode(RADIANS);
   canvas = createCanvas(windowWidth, windowHeight, WEBGL);
   checkerTex = new CheckerTex();
@@ -32,14 +52,8 @@ function setup() {
   centerVector = createVector(width/2, height/2);
   pressVector = createVector(0, 0);
   dragVector = createVector(0, 0);
-  //pixelDensity(1);
   
   ambientLight(255);
-  connectToAccount().then(response => {
-    const _seed = response.assets.map(asset => asset.traits[1].value);
-    const seedForm = new SelectForm("Seed", _seed, gui.param);
-    gui.body.child(seedForm);
-  }).catch(err => console.error(err));
 }
 
 function calibrate() {
@@ -69,13 +83,12 @@ function draw() {
       break;
   }
   
-  const tokenSeed = parseInt(gui.param.Seed);
+  tokenSeed = (gui.param.Seed && gui.param.Seed !== "Vanilla")? parseInt(gui.param.Seed): defaultSeed;
   if(prev !== tokenSeed && tokenSeed) {
-    randomSeed(tokenSeed);
-    noiseSeed(tokenSeed);
-    checkerTex.setSeed(tokenSeed);
+    setSeed(tokenSeed);
     prev = tokenSeed;
   }
+
 
   checkerTex.draw();
   blendMode(EXCLUSION);
@@ -108,6 +121,12 @@ function getAngle(time = 1) {
   } else {
     throw "time is zero";
   }
+}
+
+function setSeed(int) {
+  randomSeed(int);
+  noiseSeed(int);
+  checkerTex.setSeed(int);
 }
 
 function windowResized() {

@@ -9,13 +9,11 @@ class CheckerTex {
                         EXCLUSION,
                         MULTIPLY,
                         SCREEN,
-                        REPLACE,
                         OVERLAY,
                         HARD_LIGHT,
                         SOFT_LIGHT,
                         DODGE,
                         BURN];
-                        
     this.g.blend = this.g.blendArray[floor(random(0, this.g.blendArray.length))];
     this.g.c = color(floor(random(0, 255)), floor(random(0, 255)), floor(random(0, 255)));
     this.g.c.invert = color(red(this.g.c), green(this.g.c), blue(this.g.c)); 

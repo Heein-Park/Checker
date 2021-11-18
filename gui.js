@@ -44,9 +44,29 @@ class GUI {
       copied.updatePixels();
       copied.copy(screenShot, width/2 - copied.width/2, height/2 - copied.height/2, copied.width, copied.height, 0, 0, copied.width, copied.height);
       console.log(copied);
-      copied.save("CheckerScopic-#" + (this.param.Seed? this.param.Seed: ""), "png");
+      copied.save("CheckerScopic-" + (this.param.Seed? this.param.Seed: ""), "png");
     });
     this.body.child(this.capture);
+    
+    this.connect = new Button("Connect", async () => {
+      connectToAccount().then(response => {
+        const _seed = response.assets.map(asset => asset.traits[1].value);
+        _seed.unshift("Vanilla");
+        
+        let _prevSeedForm = select('#Seed');
+        if(_prevSeedForm) _prevSeedForm.remove();
+        
+        const seedForm = new SelectForm("Seed", _seed, this.param);
+        this.body.child(seedForm);
+      }).catch(err => console.error(err));
+    });
+    this.body.child(this.connect);
+    
+    this.reset = new Button("Zoom Reset", () => {
+      zoomRatio = 1;
+      calibrate();
+    });
+    this.body.child(this.reset);
     
     return this;
   }
@@ -61,6 +81,7 @@ class SelectForm {
     target[name] = array[0];
     
     this.div = createDiv();
+    this.div.id(name);
     this.div.class('form-group col-12');
     
     // Name Label
@@ -85,11 +106,14 @@ class SelectForm {
 }
 
 class Button {
-  constructor(name, callback) {    
+  constructor(name, callback) {
+    this.div = createDiv();
+    this.div.class('tile tile-centered');
     this.button = createElement('button', name);
-    this.button.class('btn col-12');
+    this.button.class('btn my-1 btn-block col-12 tile-content');
     this.button.elt.addEventListener('mouseup', callback);
+    this.button.parent(this.div);
     
-    return this.button;
+    return this.div;
   }
 }
