@@ -1,0 +1,19 @@
+.form-label {
+  line-height: 1.0rem;
+  padding: 0 0 0.2rem 0;
+}
+
+.opactity-transition {
+  transition-property: opacity;
+  transition-duration: 0.2s;
+}
+
+.opactity-transition.opaque {
+  filter:alpha(opacity=100);
+  opacity:1;
+}
+
+.opactity-transition.transparent {
+  filter:alpha(opacity=0);
+  opacity:0;
+}
