@@ -39,35 +39,42 @@ async function unpin(hash, headers) {
 
 
 async function connectToAccount() {
-  const seedSet = [];
-  const defaultProvider = ethers.getDefaultProvider();
-  const provider = new ethers.providers.Web3Provider(window.ethereum);
-  
-  // Prompt user for account connections
-  await provider.send("eth_requestAccounts", []);
-  const signer = provider.getSigner();
-  const signerAddress = await signer.getAddress();
-  //console.log(signer);
-  //console.log("Account:", await signer.getAddress());
-  
-  const abi = checkerContract.abi;
-  const checkerContractOnNet = new ethers.Contract("0x2886a6F30115d41A1cF4c3C0e39caf0D28d409A6", abi, signer);
-  //console.log(checkerContractOnNet);
-  
-  let MINTER_ROLE = await checkerContractOnNet.MINTER_ROLE();
-  let isMinter = await checkerContractOnNet.hasRole(MINTER_ROLE, signerAddress);
-  //console.log(MINTER_ROLE, signerAddress, isMinter);
-  
-  let balance = await checkerContractOnNet.balanceOf(signerAddress);
-  for (let i = 0; i < balance; i++) {
-    let tokenID = await checkerContractOnNet.tokenOfOwnerByIndex(signerAddress, i);
-    let tokenURL = await checkerContractOnNet.tokenURI(tokenID);
-    let _promise = new Promise((resolve, reject) => loadJSON(tokenURL, data => resolve(data)));
-    let tokenMetadata = await _promise;
-    let _seed = tokenMetadata.properties.seed.value;
+  try {
+    const seedSet = [];
+    const defaultProvider = ethers.getDefaultProvider();
+    const infuraProvider = new ethers.providers.InfuraProvider("rinkeby", {
+      infura : {
+          projectId: config.infura.project_ID,
+          projectSecret: config.infura.project_secret
+      }
+    });
+    const web3Provider = new ethers.providers.Web3Provider(window.ethereum);
     
-    seedSet.push(_seed);
+    // Prompt user for account connections
+    await web3Provider.send("eth_requestAccounts", []);
+    const signer = await web3Provider.getSigner();
+    const signerAddress = ethers.utils.getAddress(await signer.getAddress());
+    
+    const abi = checkerArtifact.abi;
+    const checkerContract = new ethers.Contract(config.contract_address, abi, signer);
+    const deployed = await checkerContract.deployed();
+
+    const owner = await deployed.owner();
+    const isMinter = (owner == signerAddress);
+    
+    let balance = await deployed.balanceOf(signerAddress);
+    for (let i = 0; i < balance; i++) {
+      let tokenID = await deployed.tokenOfOwnerByIndex(signerAddress, i);
+      let tokenURL = await deployed.tokenURI(tokenID);
+      let _promise = new Promise((resolve, reject) => loadJSON(tokenURL, data => resolve(data)));
+      let tokenMetadata = await _promise;
+      let _seed = tokenMetadata.properties.seed.value;
+      
+      seedSet.push(_seed);
+    }
+    
+    return {contract:deployed, isMinter:isMinter, address:signerAddress, seedSet:seedSet};
+  } catch (e) {
+    throw e;
   }
-  
-  return {contract:checkerContractOnNet, isMinter:isMinter, address:signerAddress, seedSet:seedSet};
 }

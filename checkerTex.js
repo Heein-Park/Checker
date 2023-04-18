@@ -15,7 +15,7 @@ class CheckerTex {
     this.c = color(floor(random(0, 255)), floor(random(0, 255)), floor(random(0, 255)));
     //this.c.invert = color(255 - red(this.c), 255 - green(this.c), 255 - blue(this.c)); 
     this.c.secondary = color(floor(random(0, 255)), floor(random(0, 255)), floor(random(0, 255)));
-    console.log(this.c, this.c.secondary);
+    //console.log(this.c, this.c.secondary);
     this.divNum = 20;
     this.angleMode(RADIANS);
   }

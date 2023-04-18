@@ -24,12 +24,14 @@ const boxNum = 1;
 const array = [];
 
 function preload() {
-  checkerContract = loadJSON('contracts/Checker.json');
+  checkerArtifact = loadJSON('contracts/Checker.json');
+  config = loadJSON('configs/env.json');
   // Loading a model from local
   checkerBall = loadModel('assets/CheckerBall.obj', true);
 }
 
-function setup() {  
+function setup() {
+  console.log(getURL());
   // uid Generation and Setting of a default random seed
   const _uid = uuid.parse(uuid.v4());
   let _prevByte;
